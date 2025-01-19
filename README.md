@@ -7,8 +7,7 @@ BRACES is a cutting-edge software solution designed to enable the accurate recon
 BRACES is an incredibly lightweight solution , involving only Python and like 2 other libraries. 
 
 # Getting Started
-To get started with BRACES, follow these steps:
-Clone the Repository:
+To get started with BRACES, clone the Repository:
 bash
 CopyEdit
 git clone https://github.com/yourusername/BRACES.git
@@ -16,3 +15,5 @@ git clone https://github.com/yourusername/BRACES.git
 # Dependencies
 Math library, re library
 
+# To Learn More
+https://docs.google.com/presentation/d/1vnON_hDc1twul3vLTbYXJcezOtgzfD0WMnEVg5PDVf4/edit?usp=sharing
