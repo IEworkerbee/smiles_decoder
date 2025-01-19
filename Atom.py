@@ -41,13 +41,12 @@ class Atom:
         self.num_bonds = len(bonds)
         self.aromatic = aromatic
         self.charge = charge
-        self.offset = None
-        self.pos = (None, None)
-        self.orientation = None
-        
-        self.num_valence         = element_dic[element][0] - bonds.sum() - (charge) 
+        self.offset = 0
+        self.pos = [0, 0]
+        self.orientation = 'UP'
+        self.num_valence         = element_dic[element][0] - sum(bonds) - (charge) 
         self.free_electron_pairs = self.num_valence / 2
-        self.covalent_radii      = element_dic[1]
+        self.covalent_radii      = element_dic[element][1]
 
     def get_angle_type(self) -> float:
         """
@@ -61,10 +60,10 @@ class Atom:
             5Bonds           : [(0, 90, 0), (0, )  ]
         """
         if (self.num_bonds == 1):
-            return 180
+            return 0
         
         elif (self.num_bonds == 2 and self.free_electron_pairs == 0):
-            return 180
+            return 0
         
         elif (self.num_bonds == 3 and self.free_electron_pairs == 0):
             return 120
