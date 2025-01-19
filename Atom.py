@@ -45,9 +45,9 @@ class Atom:
         self.pos = (None, None)
         self.orientation = None
         
-        self.num_valence         = element_dic[element][0] - bonds.sum() - (charge) 
+        self.num_valence         = element_dic[element][0] - sum(bonds) - (charge)
         self.free_electron_pairs = self.num_valence / 2
-        self.covalent_radii      = element_dic[1]
+        self.covalent_radii      = element_dic[element][1]
 
     def get_angle_type(self) -> float:
         """

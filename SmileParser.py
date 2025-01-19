@@ -1,7 +1,7 @@
 from Atom import Atom, element_dic
 
-validBondOperators = ['#', '=']
-validCharges = {"[+]", "[-]"}
+validBondOperators = {'#': 3, '=': 2, '-': 1}
+validCharges = {"[+]": 1, "[-]": -1}
 
 
 # ANDY LOOK HERE !!!!!!!!!!!!!!!!!!!!!!!
@@ -41,20 +41,29 @@ class SmileParser():
 def parseSmileSeg(smile: str):
     isTwoEl = False;
     listOfElements = []
+    skipCharges = 0
+    lastCharge = 0;
+    lastBond = 1;
+
     for i, char in enumerate(smile):
         if isTwoEl:
             isTwoEl = False
             continue
 
+        if skipCharges != 0:
+            skipCharges -= 1
+            continue
+
         if (i + 3) < (len(smile)-1):
             nextThree = char + "" + smile[i+1] + "" + smile[i+2];
             if nextThree in validCharges:
-                if (i != 0):
+                if (i == 0):
                     raise ValueError("That charge can't be there")
                 else:
-
-
-
+                    lastCharge = validCharges[nextThree];
+                    print(lastCharge, " CHARGE FOUND!")
+                    skipCharges = 3;
+                    continue
 
         # check the string
         currentElement = char;
@@ -64,24 +73,31 @@ def parseSmileSeg(smile: str):
                 currentElement =  currentElement + "" + smile[i+1]
 
         if currentElement in element_dic:
-            print(currentElement)
-            print("omg it's an element :D")
-
             # make the atom
-            currAtom = Atom(currentElement, [], False, False, -1)
+            currAtom = Atom(currentElement, [0,0], False, False, -1)
+            print(currAtom.element)
             listOfElements.append(currAtom)
+
+            currAtom.bonds.append(lastBond);
+            lastBond = 1;
 
         elif char in validBondOperators:
             print(currentElement)
             print("omg it's a valid bond operator, come back to this")
+
+            last_element = listOfElements[-1]
+            lastBond = validBondOperators[char];
+            last_element.bonds.append(validBondOperators[char])
+
         else:
-            print(currentElement)
+            print("GAHHH", currentElement)
             raise ValueError("Cannot read SMILE with unknown elements")
+
 
 
 
     ##### Helpers #####
 
 # print(removeMostH("HOCOOHH"))
-parseSmileSeg("HC=ClOH")
+parseSmileSeg("H[+]C=OH")
 
