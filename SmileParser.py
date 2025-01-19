@@ -1,7 +1,9 @@
 from Atom import Atom, element_dic
+import re
 
 validBondOperators = {'#': 3, '=': 2, '-': 1}
 validCharges = {"[+]": 1, "[-]": -1}
+listOfElements = []
 
 
 # ANDY LOOK HERE !!!!!!!!!!!!!!!!!!!!!!!
@@ -40,7 +42,6 @@ class SmileParser():
 
 def parseSmileSeg(smile: str):
     isTwoEl = False;
-    listOfElements = []
     skipCharges = 0
     lastCharge = 0;
     lastBond = 1;
@@ -93,11 +94,16 @@ def parseSmileSeg(smile: str):
             print("GAHHH", currentElement)
             raise ValueError("Cannot read SMILE with unknown elements")
 
+def goThroughBranches(smile):
+    branch = re.match(r"(.*)\((.*)\)", smile).groups()
+    parseSmileSeg("".join(branch))
+
+    for i, element in enumerate(listOfElements):
+        listOfElements[i].index = i
 
 
 
     ##### Helpers #####
 
-# print(removeMostH("HOCOOHH"))
-parseSmileSeg("H[+]C=OH")
+goThroughBranches("CCCHe(O[+]C=C)C")
 
