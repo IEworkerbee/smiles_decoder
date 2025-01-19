@@ -1,5 +1,6 @@
 from Atom import Atom, element_dic
 import re
+from geometry import get_position
 
 validBondOperators = {'#': 3, '=': 2, '-': 1}
 validCharges = {"[+]": 1, "[-]": -1}
@@ -41,10 +42,10 @@ class SmileParser():
 
 
 def parseSmileSeg(smile: str):
-    isTwoEl = False;
+    isTwoEl = False
     skipCharges = 0
-    lastCharge = 0;
-    lastBond = 1;
+    lastCharge = 0
+    lastBond = 1
 
     for i, char in enumerate(smile):
         if isTwoEl:
@@ -56,21 +57,21 @@ def parseSmileSeg(smile: str):
             continue
 
         if (i + 3) < (len(smile)-1):
-            nextThree = char + "" + smile[i+1] + "" + smile[i+2];
+            nextThree = char + "" + smile[i+1] + "" + smile[i+2]
             if nextThree in validCharges:
                 if (i == 0):
                     raise ValueError("That charge can't be there")
                 else:
-                    lastCharge = validCharges[nextThree];
+                    lastCharge = validCharges[nextThree]
                     print(lastCharge, " CHARGE FOUND!")
-                    skipCharges = 3;
+                    skipCharges = 3
                     continue
 
         # check the string
-        currentElement = char;
+        currentElement = char
         if (i < (len(smile) - 2)):
             if (smile[i+1].islower()):
-                isTwoEl = True;
+                isTwoEl = True
                 currentElement =  currentElement + "" + smile[i+1]
 
         if currentElement in element_dic:
@@ -79,15 +80,15 @@ def parseSmileSeg(smile: str):
             print(currAtom.element)
             listOfElements.append(currAtom)
 
-            currAtom.bonds.append(lastBond);
-            lastBond = 1;
+            currAtom.bonds.append(lastBond)
+            lastBond = 1
 
         elif char in validBondOperators:
             print(currentElement)
             print("omg it's a valid bond operator, come back to this")
 
             last_element = listOfElements[-1]
-            lastBond = validBondOperators[char];
+            lastBond = validBondOperators[char]
             last_element.bonds.append(validBondOperators[char])
 
         else:
@@ -95,8 +96,12 @@ def parseSmileSeg(smile: str):
             raise ValueError("Cannot read SMILE with unknown elements")
 
 def goThroughBranches(smile):
-    branch = re.match(r"(.*)\((.*)\)", smile).groups()
-    parseSmileSeg("".join(branch))
+    try:
+        branch = re.match(r"(.*)\((.*)\)", smile).groups()
+        parseSmileSeg("".join(branch))
+    except:
+        pass
+
 
     for i, element in enumerate(listOfElements):
         listOfElements[i].index = i
@@ -105,5 +110,19 @@ def goThroughBranches(smile):
 
     ##### Helpers #####
 
-goThroughBranches("CCCHe(O[+]C=C)C")
+goThroughBranches("HH[-]OH")
 
+def test_get_position():
+    atom_1 = listOfElements[0]
+    atom_2 = listOfElements[1]
+    atom_3 = listOfElements[2]
+    atom_4 = listOfElements[3]
+    get_position(atom_1, atom_2)
+    get_position(atom_1, atom_3)
+    get_position(atom_3, atom_4)
+    print(atom_1.pos)
+    print(atom_2.pos)
+    print(atom_3.pos)
+    print(atom_4.pos)
+
+test_get_position()
