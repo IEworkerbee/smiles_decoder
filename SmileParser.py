@@ -1,35 +1,8 @@
 from Atom import Atom, element_dic
 import re
-
 validBondOperators = {'#': 3, '=': 2, '-': 1}
 validCharges = {"[+]": 1, "[-]": -1}
-listOfElements = []
-
-
-# ANDY LOOK HERE !!!!!!!!!!!!!!!!!!!!!!!
-# I am going to comment this out for now.
-# I think we need the H's because they are important for generating the 3D position data. 
-# If we don't generate the 3D data and store it in the H atoms, then we can't do cool training with it. 
-# Plus a lot of the beginning chems just look like one atom. 
-
-# # SWITCHING TO 2D
-# def removeMostH(smile):
-#     index = 0
-#
-#     while index < len(smile): #not working my badddddddddddd
-#         print('look ma im in the loop', index)
-#         if smile[index] == 'H':
-#             if (index < (len(smile) - 2)) & (smile[index + 1] == 'H'):
-#                 pass
-#             elif (index != 0) & (smile[index - 1] == 'H'):
-#                 pass
-#             else:
-#                 smile.replace(smile[index], '')
-#                 print("deleting the h")
-#         index += 1
-#
-#     return smile
-
+listOfAtoms = []
 
 class SmileParser():
     
@@ -39,71 +12,62 @@ class SmileParser():
     def parse_smile(self, smiles: str):
         pass
 
+# first step is adding in all of the implied single bonds. let's break it up based on capitalization
 
-def parseSmileSeg(smile: str):
-    isTwoEl = False;
-    skipCharges = 0
-    lastCharge = 0;
-    lastBond = 1;
+def addImpliedSingleBonds(smile: str):
+    # NOTE: this might become a problem with aromatic ring representation, so be aware of that!
+    # might have to figure out a way to ONLY look at elements instead of breaking by capital letters
+    breaking = re.findall(r'[A-Z][^A-Z]*|"[+]"|"[-]"', smile)
 
-    for i, char in enumerate(smile):
-        if isTwoEl:
-            isTwoEl = False
-            continue
+    # i know this isn't a great solution i just don't know how regex works rn
+    breaking = ' - '.join(breaking)
+    breaking = breaking.replace(' - =', '=')
+    breaking = breaking.replace('= - ', '=')
+    breaking = breaking.replace(' - #', '#')
+    breaking = breaking.replace('# - ', '#')
 
-        if skipCharges != 0:
-            skipCharges -= 1
-            continue
+    print(breaking)
 
-        if (i + 3) < (len(smile)-1):
-            nextThree = char + "" + smile[i+1] + "" + smile[i+2];
-            if nextThree in validCharges:
-                if (i == 0):
-                    raise ValueError("That charge can't be there")
-                else:
-                    lastCharge = validCharges[nextThree];
-                    print(lastCharge, " CHARGE FOUND!")
-                    skipCharges = 3;
-                    continue
+    return breaking
 
-        # check the string
-        currentElement = char;
-        if (i < (len(smile) - 2)):
-            if (smile[i+1].islower()):
-                isTwoEl = True;
-                currentElement =  currentElement + "" + smile[i+1]
+def parseBranch(smile: str):
+    smile = addImpliedSingleBonds(smile)
+    splitSmile = re.split(r'( - |=|#)', smile)
 
-        if currentElement in element_dic:
-            # make the atom
-            currAtom = Atom(currentElement, [0,0], False, False, -1)
-            print(currAtom.element)
-            listOfElements.append(currAtom)
+    i = 0
+    while i < len(splitSmile):
+        # sort either element or bond
+        # if element then make a new atom object
+        if any (el in splitSmile[i] for el in element_dic):
 
-            currAtom.bonds.append(lastBond);
-            lastBond = 1;
+            # check charges
+            element = splitSmile[i].strip("[+][-]")
+            charge  = 1 if "[+]" in splitSmile[i] else -1 if "[-]" in splitSmile[i] else 0
+            # print("\tELEMENT-> ", element, " CHARGE-> ", charge)
 
-        elif char in validBondOperators:
-            print(currentElement)
-            print("omg it's a valid bond operator, come back to this")
+            newAtom = Atom(element,[], False, charge, i)
+            if not i == 0:
+                # add in your bonds babyyyyyyy
+                lastBond = splitSmile[i-1]
 
-            last_element = listOfElements[-1]
-            lastBond = validBondOperators[char];
-            last_element.bonds.append(validBondOperators[char])
+                # NOTE TO SELF: put this in a seperate function to call
+                lastBond = lastBond.replace(" ", "")
+                bond = 1 if lastBond in "-" else 2 if lastBond in "=" else 3
+                newAtom.bonds.append(bond)
 
-        else:
-            print("GAHHH", currentElement)
-            raise ValueError("Cannot read SMILE with unknown elements")
+            listOfAtoms.append(newAtom)
 
-def goThroughBranches(smile):
-    branch = re.match(r"(.*)\((.*)\)", smile).groups()
-    parseSmileSeg("".join(branch))
+        elif any (bond in splitSmile[i] for bond in validBondOperators):
+            split = splitSmile[i].replace(" ", "")
+            bond = 1 if split in "-" else 2 if split in "=" else 3
 
-    for i, element in enumerate(listOfElements):
-        listOfElements[i].index = i
+            listOfAtoms[-1].bonds.append(bond)
 
+        i = i + 1
 
+    for ex in listOfAtoms:
+        print(ex.element, " ", ex.bonds)
 
-    ##### Helpers #####
-
-goThroughBranches("CCCHe(O[+]C=C)C")
+# goThroughBranches("CCCHe(O[+]C=C)C")
+parseBranch("CC#C=HeO[+]C[-]C")
 
