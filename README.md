@@ -1,4 +1,7 @@
 # smiles_decoder
+Decodes smiles
+
+# smiles_decoder
 # BRACES: Bond and Reconstruction of Atomic Chemical Entities for Simulation
 BRACES is a cutting-edge software solution designed to enable the accurate reconstruction of chemical structures from SMILES (Simplified Molecular Input Line Entry System) strings. Built for researchers, students, and chemical informatics experts. Current libraries to convert SMILES back into chemical notations struggle with ionic bonds, leaving a large percentage of SMILES data unable to be translated back into its original chemical structure. BRACES seeks to remedy these issues by keeping detailed track of valence electrons and charges for individual atoms. 
 
