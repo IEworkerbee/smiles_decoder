@@ -28,7 +28,7 @@ class Mol:
         pass
 
     # Combines self molecule with second molecule. Adds one bond to connect them. 
-    def combine_mol(self, Mol_2: Self, atom_1_index, atom_2_index):
+    def combine_mol(self, Mol_2: Self, atom_1_index: int, atom_2_index: int, bond_level: int):
         """
             param 1: Second Molecule to combine
             param 2: index of atom in first molecule to connect to second molecule
@@ -53,13 +53,41 @@ class Mol:
 
         indexes = [atom_1_index, atom_2_index]
         combined_mol.bonds.append(min(indexes), max(indexes))
+        for i in indexes:
+            combined_mol[i].bonds.append(bond_level)
+            combined_mol[i].num_bonds += 1
+            combined_mol[i].num_valence -= bond_level
+            combined_mol[i].free_electron_pairs = combined_mol[i].num_valence / 2
  
         return combined_mol
+    
+    def add_atom(self, atom: Atom, index_atom_to_bond: int, bond_level) -> None:
+            self.atoms.append(atom)
+            index_new = len(self.atoms)
+            self.atoms[index_new].index = index_new
+            indexes = [index_new, index_atom_to_bond]
+            self.bonds.append((min(indexes), max(indexes)))
 
-        
+            for i in indexes: 
+                self.atoms[i].bonds.append(bond_level)
+                self.atoms[i].num_bonds += 1
+                self.atoms[i].num_valence -= bond_level
+                self.atoms[i].free_electron_pairs = self.atoms[i].num_valence / 2
+
+    def add_bond(self, index_1: int, index_2: int, bond_level: int) -> None:
+        # TODO
+        pass
 
     def add_implied_hydrogens(self):
-        # TODO:
-        pass
+        # GODDAMN FUCKING CARBENES
+        for atom in self.atoms:
+            if atom.element == 'C':
+                if atom.charge == -2:
+                    # carbene
+                    pass
+                else:
+                    while atom.num_valence != 0:
+                        hydrogen = Atom('H', 0)
+                        self.add_atom(hydrogen)
 
     
