@@ -1,5 +1,18 @@
 #key is the string with the name of the chemical, value is atomic number, valence electrons
-#hardcoded information about each of the elements (# valence electrons, picometers atomic radii)
+#hardcoded information about each of the elements (# valence electrons, picometers atomic radii, valence ?)
+
+# S orbitals always hold 2
+# P orbitals always hold 6
+# D orbitals always hold 10
+# F orbitals always hold 14
+
+# The 'd' block of periodic table is the filling of the d orbitals. 
+# Negative anions have extra electron to make 1 electron pair
+# Positive cations have valence spot also taken up but because that electron is gone
+
+# Hydrogens only fill automagically on carbons
+
+
 
 from typing import List
 
@@ -25,26 +38,25 @@ element_dic = {'C':  (4,  77),
                }
 
 class Atom:
-    def __init__(self, element: str, bonds: List[int], aromatic: bool, charge: int, index: int) -> bool: 
+    def __init__(self, element: str, charge: int) -> bool: 
         """
         Param:
             Element:  String holding atomic symbol
             Bonds:    List of bond types connecting to element: 1, 2, 3 for bond type
             Aromatic: bool, is aromatic?
-            Charge:   -1, 0, +1
+            Charge:   -1, 0, +1 (need more)
 
             returns:  bool (success?)
         """
-        self.index = index
+        self.index = 0
         self.element = element
-        self.bonds = bonds
-        self.num_bonds = len(bonds)
-        self.aromatic = aromatic
+        self.bonds = []
+        self.num_bonds = len(self.bonds)
         self.charge = charge
         self.offset = 0
         self.pos = [0, 0]
         self.orientation = 'UP'
-        self.num_valence         = element_dic[element][0] - sum(bonds) - (charge) 
+        self.num_valence         = element_dic[element][0] - sum(self.bonds) - (charge) 
         self.free_electron_pairs = self.num_valence / 2
         self.covalent_radii      = element_dic[element][1]
 
